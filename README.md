@@ -1,6 +1,6 @@
 # BTCPyment
 <!---Existing self-custody Bitcoin payment processors are bloated, difficult to install, and not easily customisable.--->
-BTCPyment is a simple, easily deployable, lightweight Bitcoin payment processor that connects to your own Bitcoin node or Lightning network node.
+BTCPyment is a simple, easily deployable, lightweight Bitcoin payment processor that connects to your own Dojo.
 
 Donation Button     ----->  |  Bitcoin Payment Gateway
 :-------------------------:|:-------------------------:
@@ -10,24 +10,23 @@ BTCPyment currently serves as a
 1. Donation button for your website that you can easily embed/link to anywhere.
 2. Bitcoin payment gateway, including a Woocommerce plugin that easily turns ANY Wordpress site into a Bitcoin accepting store.
 
-BTCPyment makes donation buttons simple - copy/paste the one line HTML <iframe> into your site. With a simple Python backend to talk to your own Bitcoin node, BTCPyment uses RPC to generate new addresses, and monitors the payment status with your own copy of the blockchain.
+BTCPyment makes donation buttons simple - copy/paste the one line HTML <iframe> into your site. With a simple Python backend to talk to your own Dojo, BTCPyment uses RPC to generate new addresses, and monitors the payment status with your own copy of the blockchain.
 
 # Features
-* Process payments with your own Bitcoin node via RPC and SSH using Dojo.
+* Process payments with your Dojo via RPC and SSH.
 * Direct peer-to-peer payments without any middleman. No KYC, and greater privacy than donation systems where Bitcoin addresses are reused multiple times.
-* Lightweight and highly extendable, basic html and css styling. Modular Python backend, take a [look at the code](server.py) or [lnd.py](/pay/lnd.py)!
+* Lightweight and highly extendable, basic html and css styling. Modular Python backend, take a [look at the code](server.py).
 * Natively extendable to all bitcoind node features (e.g. segwit) through RPC.
 * QR codes, customizable required payment confirmations and payment expiry time.
 * No shitcoin bloat. Bitcoin only.
 
 # Installation (short!)
-You require a Raspberry Pi / server (VPS) to host an instance of BTCPyment on, and a connection to a Bitcoin node. If you don't have a Dojo, you should [install one](https://code.samourai.io/dojo/samourai-dojo/).
+You require a Raspberry Pi / server (VPS) to host an instance of BTCPyment on, and a Dojo full node. If you don't have a Dojo, you should [install one](https://code.samourai.io/dojo/samourai-dojo/).
 
 ### Configure Dojo
 ##### Edit the `docker-bitcoind.conf` file.
 ```
-cd ~/dojo/samourai-dojo-v1.9/docker/my-dojo/conf
-sudo nano docker-bitcoind.conf
+sudo nano ~/dojo/samourai-dojo-vX.X/docker/my-dojo/conf/docker-bitcoind.conf
 ```
 ##### Change RPC exposure variable.
 ```
@@ -35,10 +34,9 @@ BITCOIND_RPC_EXTERNAL=on
 ```
 ##### Edit relevant `restart.sh` file.
 ```
-cd ~/dojo/samourai-dojo-v1.9/docker/my-dojo/bitcoin
-sudo nano restart.sh
+sudo nano ~/dojo/samourai-dojo-vX.X/docker/my-dojo/bitcoin/restart.sh
 ```
-##### Change bitcoind_options variables. Can be copy/pasted, just mind the second `-rpcallowip=[Remote Server IP]` variable. If running BTCPyment on the same machine as your Dojo, just delete that line completely.
+##### Change bitcoind_options variables. Mind the second `-rpcallowip=[Remote Server IP]` variable. If running BTCPyment on the same machine as your Dojo, delete that line completely.
 ```
 bitcoind_options=(
 -datadir=/home/bitcoin/.bitcoin
@@ -69,11 +67,11 @@ bitcoind_options=(
 ```
 ##### Force rebuilding of Dojo Docker Containers.
 ```
-cd ~/dojo/samourai-dojo-v1.9/docker/my-dojo
+cd ~/dojo/samourai-dojo-vX.X/docker/my-dojo
 ./dojo.sh stop
 ./dojo.sh upgrade --nocache
 ```
-This will not actually upgrade your Dojo, as you should see a message asking if you are sure you want to upgrade to Dojo v1.9, which is already the current version. Choose `y` there and wait for the upgrade script to run its course and rebuild Docker containers with the new variables enacted. Once you see logs for Docker Containers like Tor, Nodejs, and Bitcoind begin appearing in your terminal window, you can `ctrl+c` to exit the process. Dojo will continue running.
+This will not actually upgrade your Dojo, as you should see a message asking if you are sure you want to upgrade to Dojo v1.9, which is already the current version. Choose `y` there and wait for the upgrade script to run its course and rebuild Docker containers with the new variables enacted. Once you see logs for Docker Containers like Tor, Nodejs, and Bitcoind begin appearing in your terminal window, you can `CTRL+C` to exit the process. Dojo will continue running.
 
 ##### Next create and load a wallet.
 ```
@@ -117,16 +115,15 @@ That's it! You should now be able to view your BTCPyment server at `http://YOUR_
 
 If running on a Raspberry Pi, you will want to [forward port 8000 in your router settings](https://user-images.githubusercontent.com/24557779/105681219-f0f5fd80-5f44-11eb-942d-b574367a161f.png) so that BTCPYment is also visible at your external IP address. You might have to allow gunicorn through your firewall with `sudo ufw allow 8000`.
 
-## You will want to run gunicorn with nohup so it continues serving in the background. In the terminal window currently running BTCPyment:
+## You will want to run gunicorn with nohup so it continues serving in the background. In the terminal window currently running BTCPyment, first `CTRL+C`, then:
 ```
-ctrl+c
 nohup gunicorn --worker-class eventlet -w 1 -b 0.0.0.0:8000 server:app > log.txt 2>&1 &
 tail -f log.txt
 ```
 
 ### Embed a Donation Button
 Now embed the donation button into your website HTML:
-```html
+```
 <iframe src="http://YOUR_SERVER_IP:8000/" style="margin: 0 auto;display:block;width:600px;height:480px;border:none;overflow:hidden;" scrolling="yes"></iframe>
 ```
 Changing `YOUR_SERVER_IP` to the IP address of the machine you're running BTCPyment on. Optionally, you can redirect a domain to that IP and use that instead, removing the port `:8000` from the end of `YOUR_DOMAIN_NAME`.
