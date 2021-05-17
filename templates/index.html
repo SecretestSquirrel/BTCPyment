@@ -41,21 +41,9 @@
             <p id="timerContainer" style="padding:0;"><span id="timer"></span> seconds remaining.</p>
         </div>
 
-        </br>
+        </br
 
-        <div id="row">
-            <div id="left" style="text-align: left; padding: 0;">
-                <!-- Alternate between offering lightning or on chain payment switch -->
-                {% if params.lnd_enabled %}
-                    {% if params.method != "bitcoind"%}
-                        <button class="button button1" onclick="replaceUrlParam(window.location, 'method', 'bitcoind');">Onchain Payment</button>
-                    {% else %}
-                        <button class="button button1" onclick="replaceUrlParam(window.location, 'method', 'lnd');">Lightning Payment</button>
-                    {% endif %}
-                {% endif %}
-            </div>
-
-            <div id="right" style="text-align: right; padding: 10px 10px;">
+            <div id="center" style="text-align: center; padding: 10px 10px;">
                 <small style="vertical-align:middle"><a id="about" href="https://github.com/nickfarrow/BTCPyment" target="_blank">BTCPyment</a></small>
             </div>
         </div>
