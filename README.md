@@ -75,9 +75,9 @@ This will not actually upgrade your Dojo, as you should see a message asking if 
 
 ##### Next create and load a wallet.
 ```
-./dojo.sh bitcoin-cli createwallet "btcpyment"
+./dojo.sh bitcoin-cli createwallet "btcpyment" true
 ```
-- Note: If you want to create more than one wallet (i.e. one for regular use and a separate wallet for donations) that is fine. You would simply create another wallet with a different specified name, as in `./dojo.sh bitcoin-cli createwallet "personal"`, which just distinguishes which wallet BTCPyment will look for later when you adjust configuration.
+- This will create and load a Watch-Only wallet, so no private keys being held on your node for increased security.
 
 
 ### Installing BTCPyment
@@ -115,11 +115,12 @@ That's it! You should now be able to view your BTCPyment server at `http://YOUR_
 
 If running on a Raspberry Pi, you will want to [forward port 8000 in your router settings](https://user-images.githubusercontent.com/24557779/105681219-f0f5fd80-5f44-11eb-942d-b574367a161f.png) so that BTCPYment is also visible at your external IP address. You might have to allow gunicorn through your firewall with `sudo ufw allow 8000`.
 
-##### You will want to run gunicorn with nohup so it continues serving in the background. In the terminal window currently running BTCPyment, first `CTRL+C`, then:
+- To run BTCPyment so it continues serving in the background, in the terminal window currently running BTCPyment first `CTRL+C`, then:
 ```
 nohup gunicorn --worker-class eventlet -w 1 -b 0.0.0.0:8000 server:app > log.txt 2>&1 &
 tail -f log.txt
 ```
+Once started, do `Ctrl+C` again to regain your terminal.
 
 ### Embed a Donation Button
 Now embed the donation button into your website HTML:
