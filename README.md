@@ -26,7 +26,7 @@ You require a local computer / remote server (VPS) to host an instance of BTCPym
 ### Configure Dojo
 ##### Edit the `docker-bitcoind.conf` file.
 ```
-sudo nano ~/dojo/samourai-dojo-vX.X/docker/my-dojo/conf/docker-bitcoind.conf
+$ sudo nano ~/dojo/samourai-dojo-vX.X/docker/my-dojo/conf/docker-bitcoind.conf
 ```
 ##### Change RPC exposure variable.
 ```
@@ -34,7 +34,7 @@ BITCOIND_RPC_EXTERNAL=on
 ```
 ##### Edit relevant `restart.sh` file.
 ```
-sudo nano ~/dojo/samourai-dojo-vX.X/docker/my-dojo/bitcoin/restart.sh
+$ sudo nano ~/dojo/samourai-dojo-vX.X/docker/my-dojo/bitcoin/restart.sh
 ```
 ##### Change bitcoind_options variables. Mind the second `-rpcallowip=[Remote Server IP]` variable. If running BTCPyment on the same machine as your Dojo, delete that line completely.
 ```
@@ -67,15 +67,15 @@ bitcoind_options=(
 ```
 ##### Force rebuilding of Dojo Docker Containers.
 ```
-cd ~/dojo/samourai-dojo-vX.X/docker/my-dojo
-./dojo.sh stop
-./dojo.sh upgrade --nocache
+$ cd ~/dojo/samourai-dojo-vX.X/docker/my-dojo
+$ ./dojo.sh stop
+$ ./dojo.sh upgrade --nocache
 ```
 This will not actually upgrade your Dojo, as you should see a message asking if you are sure you want to upgrade to Dojo vX.X, which is already the current version you are running. Choose `y` there and wait for the upgrade script to run its course and rebuild Docker containers with the new variables enacted. Once you see logs for Docker Containers like Tor, Nodejs, and Bitcoind begin appearing in your terminal window, you can `CTRL+C` to exit the process. Dojo will continue running.
 
 ##### Next create and load a wallet.
 ```
-./dojo.sh bitcoin-cli createwallet "btcpyment" true
+$ ./dojo.sh bitcoin-cli createwallet "btcpyment" true
 ```
 - This will create and load a Watch-Only wallet, so no private keys being held on your node for increased security.
 
@@ -83,15 +83,15 @@ This will not actually upgrade your Dojo, as you should see a message asking if 
 ### Installing BTCPyment
 ##### Make sure Python3 and Pip are installed.
 ```
-sudo apt-get update
-sudo apt install python3
-sudo apt install python3-pip
+$ sudo apt-get update
+$ sudo apt install python3
+$ sudo apt install python3-pip
 ```
 ##### Clone and install dependencies
 ```
-git clone https://github.com/secretestsquirrel/BTCPyment-DV
-cd BTCPyment-DV/
-pip3 install -r requirements.txt
+$ git clone https://github.com/secretestsquirrel/BTCPyment-DV
+$ cd BTCPyment-DV/
+$ pip3 install -r requirements.txt
 ```
 
 ### Connect to your Bitcoin Node
@@ -106,21 +106,30 @@ wallet = "btcpyment"
 (You can find these in `~/dojo/samourai-dojo-v1.9/docker/my-dojo/conf/docker-bitcoind.conf`). If your node is remote to your server, you can specify an SSH `tunnel_host = "hostname@local_computer_IP"` that will forward `rpcport`. You may also need to set `rpcallowip=REMOTE_SERVER_IP` in your `~/dojo/samourai-dojo-v1.9/docker/my-dojo/bitcoin/restart.sh`.
 
 ### Run BTCPyment
-##### Run BTCPyment with
 ```
-gunicorn --worker-class eventlet -w 1 -b 0.0.0.0:8000 server:app
+$ gunicorn --worker-class eventlet -w 1 -b 0.0.0.0:8000 server:app
 ```
 
 That's it! You should now be able to view your BTCPyment server at `http://YOUR_SERVER_IP:8000/`. If running locally, this will be `127.0.0.1:8000`.
 
 If running on a local server, you will want to forward port 8000 in your router settings so that BTCPYment is also visible at your external IP address. You might have to allow gunicorn through your firewall with `sudo ufw allow 8000`. If running BTCPyment on a remote server and using SSH tunnel to call to your local Dojo, may also need to open SSH Port 22 with `sudo ufw allow 22`. _If you are going this route be sure to at least use a strong Root password on your local device. You will need to input this Root password when you start gunicorn and attempt to connect to Dojo through your SSH tunnel._
 
-- To run BTCPyment so it continues serving in the background on a local server, in the terminal window currently running BTCPyment first `CTRL+C`, then:
+- To run BTCPyment so it continues serving in the background on a _local_ server, in the terminal window currently running BTCPyment first `CTRL+C`, then:
 ```
-nohup gunicorn --worker-class eventlet -w 1 -b 0.0.0.0:8000 server:app > log.txt 2>&1 &
+$ nohup gunicorn --worker-class eventlet -w 1 -b 0.0.0.0:8000 server:app > log.txt 2>&1 &
 tail -f log.txt
 ```
-Once started, do `Ctrl+C` again to regain your terminal. _Remote servers will not be able to exercise this command, since you will need to input your Root password to open the SSH tunnel. This cannot be done if you run gunicorn with nohup._
+Once started, do `Ctrl+C` again to regain your terminal. 
+
+- To run BTCPyment so it continues serving in the background on a _remote_ server, in the SSH terminal window currently running BTCPyment first `Ctrl+C`, then:
+```
+$ screen
+$ gunicorn --worker-class eventlet -w 1 -b 0.0.0.0:8000 server:app
+[Input SSH password when prompted]
+$ Ctrl+A
+$ Ctrl+D
+```
+This will detach from the terminal while keeping BTCPyment running in the background. To get back into the running process, enter `screen -r`.
 
 ### Embed a Donation Button
 Now embed the donation button into your website HTML:
