@@ -41,9 +41,21 @@ class btcd():
                 Check your RPC / port tunneling settings and try again."
             )
 
-    def invoice(self, dollar_value, currency, label, test=False):
-        super().__init__(dollar_value, currency, label, test)
-        print(self.__dict__)
+    def invoice(self, dollar_value, currency, label):
+        self.dollar_value = dollar_value
+        self.currency = currency
+        self.value = round(get_btc_value(dollar_value, currency), 8)
+        self.uuid = str(uuid.uuid4())
+        self.label = self.uuid
+        self.status = "Payment initialised."
+        self.response = ""
+        self.time_left = config.payment_timeout
+        self.confirmed_paid = 0
+        self.unconfirmed_paid = 0
+        self.paid = False
+        self.txid = ""
+        self.get_address()
+        self.create_qr()
         return
 
     def check_payment(self):
