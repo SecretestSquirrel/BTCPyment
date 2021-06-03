@@ -143,9 +143,9 @@ def update_status(payment, status, console_status=True):
 # Initialise the payment via the payment method (bitcoind / lightningc / etc),
 def create_invoice(dollar_amount, currency, label, payment_method=config.pay_method):
     if payment_method == "bitcoind":
-        payment = bitcoind.btcd(dollar_amount, currency, label)
+        payment = bitcoin_node
     elif payment_method == "lnd":
-        payment = lnd.lnd(dollar_amount, currency, label)
+        payment = lightning_node
     else:
         print("Invalid payment method")
         return
@@ -155,7 +155,9 @@ def create_invoice(dollar_amount, currency, label, payment_method=config.pay_met
     payment.create_qr()
     return payment
 
-
+    # Load invoice
+    payment.invoice(dollar_amount, currency, label)
+    
 # Payment processing function.
 # Handle payment logic.
 def process_payment(payment):
@@ -205,11 +207,11 @@ def process_payment(payment):
 
 # Test Bitcoind connection on startup:
 print("Checking node connectivity...")
-if config.pay_method == "bitcoind":
-    bitcoind.btcd(1, "USD", "Init test.", test=True)
-elif config.pay_method == "lnd":
-    lnd.lnd(1, "USD", "Init test", test=True)
+bitcoin_node = bitcoind.btcd()
 print("Connection successful.")
+if config.py_method == "lnd":
+    lightning_node = lnd.lnd()
+    print("Connection to lightning node successful")
 
 
 if __name__ == "__main__":
