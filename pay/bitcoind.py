@@ -3,7 +3,7 @@ import config
 from invoice.payment_invoice import invoice
 
 
-class btcd(invoice):
+class btcd():
     def __init__(self):
         # super().__init__(dollar_value, currency, label, test)
         # print(self.__dict__)
