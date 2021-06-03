@@ -57,6 +57,15 @@ class btcd():
         self.get_address()
         self.create_qr()
         return
+    
+    def create_qr(self):
+        qr_str = "{}?amount={}&label={}".format(
+            self.address.upper(), self.value, self.label
+        )
+
+        img = qrcode.make(qr_str)
+        img.save("static/qr_codes/{}.png".format(self.uuid))
+        return
 
     def check_payment(self):
         transactions = self.rpc.listtransactions()
