@@ -75,10 +75,8 @@ This will not actually upgrade your Dojo, as you should see a message asking if 
 
 ##### Next create and load a wallet.
 ```
-$ ./dojo.sh bitcoin-cli createwallet "btcpyment" true
+$ ./dojo.sh bitcoin-cli createwallet "btcpyment"
 ```
-- This will create and load a Watch-Only wallet, so no private keys being held on your node for increased security.
-
 
 ### Installing BTCPyment
 ##### Make sure Python3 and Pip are installed.
